@@ -116,7 +116,7 @@ function getErrorMessage(error) {
 function getFullUrl(url = '') {
   let fullUrl = url.trim()
 
-  if (!/[^.]\.[a-z]{2,}$/i.test(url)) {
+  if (!/[^.]\.[a-z]{2,}/i.test(url)) {
     return ''
   }
 
@@ -142,7 +142,7 @@ export default {
       url: '',
       error: null,
       mdiMagnify,
-      urlRules: [(v) => !!getFullUrl(v) || 'Please enter a valid URL'],
+      urlRules: [(v) => !v || !!getFullUrl(v) || 'Please enter a valid URL'],
       submitting: false,
       technologies: [],
       valid: false,
@@ -205,9 +205,13 @@ export default {
       this.error = null
       this.technologies = []
 
-      this.url = getFullUrl(this.url)
+      const url = getFullUrl(this.url)
 
-      if (!this.$refs.form.validate()) {
+      if (url) {
+        this.url = url
+      }
+
+      if (!this.url || !this.$refs.form.validate()) {
         return
       }
 
