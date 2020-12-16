@@ -1,0 +1,5 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target" : { "namespace": "android_app", "package_name": "com.wappalyzer.twa",
+                   "sha256_cert_fingerprints": ["D3:9B:46:74:A5:82:E5:69:A4:21:13:C1:B0:A2:FB:11:C6:9C:D6:32:C3:7E:E4:E6:23:A1:A4:EA:21:D0:AC:9C"] }
+    }]
