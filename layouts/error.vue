@@ -1,5 +1,5 @@
 <template>
-  <v-alert v-if="statusCode !== 404" type="error" class="mt-4" outlined>
+  <v-alert type="error" class="mt-4" outlined>
     {{ message }}
 
     <template v-if="code">

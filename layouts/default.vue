@@ -31,7 +31,7 @@
 
                 <v-list-item nav dense>
                   <v-list-item-title class="font-weight-regular">
-                    Credits: {{ parseFloat(credits).toLocaleString() }}
+                    Credits: {{ parseFloat(credits || 0).toLocaleString() }}
                   </v-list-item-title>
                 </v-list-item>
 
@@ -41,7 +41,7 @@
               <v-list nav dense>
                 <v-list-item-group>
                   <v-list-item
-                    :href="`${websiteUrl}?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
+                    :href="`${$config.WEBSITE_URL}?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
                     target="_blank"
                   >
                     <v-list-item-icon>
@@ -56,7 +56,7 @@
                   </v-list-item>
 
                   <v-list-item
-                    :href="`${websiteUrl}/account/?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
+                    :href="`${$config.WEBSITE_URL}/account/?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
                     target="_blank"
                   >
                     <v-list-item-icon>
@@ -132,7 +132,6 @@ export default {
       mdiOpenInNew,
       mdiLogoutVariant,
       mdiDotsVertical,
-      websiteUrl: process.env.WEBSITE_URL,
     }
   },
   computed: {

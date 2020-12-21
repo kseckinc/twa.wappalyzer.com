@@ -30,7 +30,7 @@ export default {
   },
   publicRuntimeConfig,
   head: {
-    titleTemplate: (title) => `${title ? `${title} - ` : ''}Wappalyzer`,
+    titleTemplate: () => 'Wappalyzer',
     meta: [
       { charset: 'utf-8' },
       { theme_color: '#4608ad' },
@@ -43,7 +43,7 @@ export default {
       },
       {
         rel: 'apple-touch-icon',
-        href: '/icon.png',
+        href: '/apple-touch-icon.png',
       },
     ],
   },
@@ -61,7 +61,7 @@ export default {
   ],
   modules: ['@nuxtjs/axios', '@nuxtjs/google-gtag', '@nuxtjs/pwa'],
   'google-gtag': {
-    // id: 'UA-216336-5',
+    id: 'G-YV82S8286L',
   },
   axios: {
     baseURL: publicRuntimeConfig.BASE_URL,

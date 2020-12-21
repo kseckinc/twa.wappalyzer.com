@@ -6,16 +6,13 @@ function getAuth(state) {
 }
 
 // eslint-disable-next-line handle-callback-err
-export default ({ store: { dispatch, state }, $axios }) => {
+export default ({ store: { dispatch, state }, $axios, $config }) => {
   $axios.onRequest((config) => {
     if (!/^https?:/.test(config.url)) {
       config.headers.common.Authorization = getAuth(state)
 
       if (!config.apiVersioned) {
-        config.url = config.url.replace(
-          /^([^/]+)/,
-          `$1/${process.env.API_VERSION}`
-        )
+        config.url = config.url.replace(/^([^/]+)/, `$1/${$config.API_VERSION}`)
 
         config.apiVersioned = true
       }

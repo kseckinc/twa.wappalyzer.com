@@ -17,7 +17,7 @@
             :error-messages="error"
             :rules="urlRules"
             :hint="`You have ${parseFloat(
-              credits
+              credits || 0
             ).toLocaleString()} credits remaining.`"
             @click:append="submit"
             @focus="$event.target.select()"
@@ -29,7 +29,7 @@
     <v-card v-for="category in categorised" :key="category.slug" class="mb-4">
       <v-card-title class="subtitle-2">
         <a
-          :href="`${websiteUrl}/technologies/${category.slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
+          :href="`${$config.WEBSITE_URL}/technologies/${category.slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
           target="_blank"
           class="black--text text-decoration-none"
         >
@@ -45,13 +45,16 @@
             >
               <td>
                 <a
-                  :href="`${websiteUrl}/technologies/${
+                  :href="`${$config.WEBSITE_URL}/technologies/${
                     categories.length ? `${categories[0].slug}/` : ''
                   }${slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
                   target="_blank"
                   class="d-flex align-center body-2 my-2"
                 >
-                  <TechnologyIcon :base-url="websiteUrl" :icon="icon" />
+                  <TechnologyIcon
+                    :base-url="$config.WEBSITE_URL"
+                    :icon="icon"
+                  />
                   {{ name }}
                 </a>
               </td>
@@ -71,7 +74,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          :href="`${websiteUrl}/credits/`"
+          :href="`${$config.WEBSITE_URL}/credits/`"
           color="accent"
           target="_blank"
           text
@@ -146,7 +149,6 @@ export default {
       submitting: false,
       technologies: [],
       valid: false,
-      websiteUrl: process.env.WEBSITE_URL,
     }
   },
   computed: {
