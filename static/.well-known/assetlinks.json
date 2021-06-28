@@ -1,5 +1,10 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target" : { "namespace": "android_app", "package_name": "com.wappalyzer.twa",
-                   "sha256_cert_fingerprints": ["D3:9B:46:74:A5:82:E5:69:A4:21:13:C1:B0:A2:FB:11:C6:9C:D6:32:C3:7E:E4:E6:23:A1:A4:EA:21:D0:AC:9C"] }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.wappalyzer.twa",
+    "sha256_cert_fingerprints": [
+      "10:B1:4A:A0:4D:D0:4D:C8:A8:B6:8A:61:63:C9:0B:2D:12:03:09:39:26:15:1E:AE:3E:A1:65:B3:E1:83:85:FC"
+    ]
+  }
+}]

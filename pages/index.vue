@@ -2,7 +2,10 @@
   <div>
     <v-card class="mb-4">
       <v-card-title>
-        Technology lookup
+        <div class="d-flex align-center">
+          <v-icon color="primary" left>{{ mdiLayersOutline }}</v-icon>
+          Lookup
+        </div>
       </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" @submit.prevent="submit">
@@ -10,8 +13,9 @@
             ref="url"
             v-model="url"
             hide-details="auto"
-            label="Website URL"
+            label="Enter a website URL"
             placeholder="https://www.example.com"
+            outlined
             :append-icon="mdiMagnify"
             :loading="submitting"
             :error-messages="error"
@@ -26,55 +30,83 @@
       </v-card-text>
     </v-card>
 
-    <v-card v-for="category in categorised" :key="category.slug" class="mb-4">
-      <v-card-title class="subtitle-2">
-        <a
-          :href="`${$config.WEBSITE_URL}/technologies/${category.slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
-          target="_blank"
-          class="black--text text-decoration-none"
-        >
-          {{ category.name }}
-        </a>
-      </v-card-title>
-      <v-card-text class="px-0">
-        <v-simple-table>
-          <tbody>
-            <tr
-              v-for="{ name, slug, categories, icon } in category.technologies"
-              :key="name"
+    <v-expansion-panels
+      v-if="
+        !submitting &&
+        !error &&
+        (Object.keys(attributes).length || keywords.length)
+      "
+      class="mt-4"
+    >
+      <Attributes
+        v-if="Object.keys(attributes).length"
+        :hostname="attributes"
+        :masked-sets="maskedSets"
+        @signIn="signInDialog = true"
+      />
+
+      <v-expansion-panel v-if="keywords && keywords.length" flat>
+        <v-expansion-panel-header class="subtitle-2" style="line-height: 1em">
+          Keywords
+        </v-expansion-panel-header>
+        <v-expansion-panel-content eager>
+          <v-chip-group column>
+            <v-chip
+              v-for="keyword in keywords"
+              :key="keyword"
+              :href="`${websiteUrl}/websites/${keyword}/`"
+              color="accent--text"
+              outlined
+              label
             >
-              <td>
-                <a
-                  :href="`${$config.WEBSITE_URL}/technologies/${
-                    categories.length ? `${categories[0].slug}/` : ''
-                  }${slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
-                  target="_blank"
-                  class="d-flex align-center body-2 my-2"
-                >
-                  <TechnologyIcon
-                    :base-url="$config.WEBSITE_URL"
-                    :icon="icon"
-                  />
-                  {{ name }}
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-      </v-card-text>
+              {{ keyword }}
+            </v-chip>
+          </v-chip-group>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
+    <v-card v-if="!submitting && !error && technologies.length" class="my-4">
+      <v-card-title class="subtitle-2">Technologies</v-card-title>
+      <div v-for="category in categorised" :key="category.slug" class="mb-4">
+        <v-divider />
+
+        <v-card-title class="subtitle-2">
+          {{ category.name }}
+        </v-card-title>
+        <v-card-text class="pa-0">
+          <v-simple-table>
+            <tbody>
+              <tr
+                v-for="{ name, slug, icon } in category.technologies"
+                :key="name"
+              >
+                <td>
+                  <a
+                    :href="`${websiteUrl}/technologies/${category.slug}/${slug}/?utm_source=lookup&utm_medium=twa&utm_campaign=wappalyzer`"
+                    target="_blank"
+                    class="d-flex align-center body-2 my-2"
+                  >
+                    <TechnologyIcon :base-url="websiteUrl" :icon="icon" />
+                    {{ name }}
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </v-card-text>
+      </div>
     </v-card>
 
     <v-card v-if="!credits">
-      <v-card-title class="subtitle-2">
-        No credits remaining
-      </v-card-title>
+      <v-card-title class="subtitle-2">No credits remaining</v-card-title>
       <v-card-text class="pb-0">
         Please top-up your credit balance.
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn
-          :href="`${$config.WEBSITE_URL}/credits/`"
+          :href="`${websiteUrl}/credits/`"
           color="accent"
           target="_blank"
           text
@@ -87,9 +119,10 @@
 
 <script>
 import { mapState } from 'vuex'
-import { mdiMagnify } from '@mdi/js'
+import { mdiMagnify, mdiLayersOutline } from '@mdi/js'
 
 import TechnologyIcon from '~/components/TechnologyIcon.vue'
+import Attributes from '~/components/Attributes.vue'
 
 function getErrorMessage(error) {
   if (error.response) {
@@ -139,16 +172,22 @@ function getFullUrl(url = '') {
 export default {
   components: {
     TechnologyIcon,
+    Attributes,
   },
   data() {
     return {
       url: '',
       error: null,
       mdiMagnify,
+      mdiLayersOutline,
       urlRules: [(v) => !v || !!getFullUrl(v) || 'Please enter a valid URL'],
       submitting: false,
+      attributes: {},
       technologies: [],
+      keywords: [],
+      maskedSets: [],
       valid: false,
+      websiteUrl: this.$config.WEBSITE_URL,
     }
   },
   computed: {
@@ -205,7 +244,10 @@ export default {
   methods: {
     async submit() {
       this.error = null
+      this.attributes = {}
       this.technologies = []
+      this.keywords = []
+      this.maskedSets = []
 
       const url = getFullUrl(this.url)
 
@@ -225,9 +267,11 @@ export default {
 
       try {
         ;({
+          maskedSets: this.maskedSets,
           credits,
           technologies: this.technologies,
           attributes: this.attributes,
+          keywords: this.keywords,
         } = (
           await this.$axios(`lookup-site/${encodeURIComponent(this.url)}`)
         ).data)

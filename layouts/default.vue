@@ -18,9 +18,7 @@
               <template v-if="isSignedIn">
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title>
-                      Signed in as:
-                    </v-list-item-title>
+                    <v-list-item-title> Signed in as: </v-list-item-title>
                     <v-list-item-subtitle>
                       {{ user.email }}
                     </v-list-item-subtitle>
@@ -41,7 +39,7 @@
               <v-list nav dense>
                 <v-list-item-group>
                   <v-list-item
-                    :href="`${$config.WEBSITE_URL}?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
+                    :href="`${websiteUrl}?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
                     target="_blank"
                   >
                     <v-list-item-icon>
@@ -56,7 +54,7 @@
                   </v-list-item>
 
                   <v-list-item
-                    :href="`${$config.WEBSITE_URL}/account/?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
+                    :href="`${websiteUrl}/account/?utm_source=sidenav&utm_medium=twa&utm_campaign=wappalyzer`"
                     target="_blank"
                   >
                     <v-list-item-icon>
@@ -72,9 +70,7 @@
                     <v-list-item-icon>
                       <v-icon>{{ mdiLogoutVariant }}</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>
-                      Sign out
-                    </v-list-item-title>
+                    <v-list-item-title> Sign out </v-list-item-title>
                   </v-list-item>
                 </v-list-item-group>
               </v-list>
@@ -124,6 +120,7 @@ export default {
     Progress,
   },
   data() {
+    console.log(this.$config)
     return {
       loading: true,
       drawer: false,
@@ -132,6 +129,7 @@ export default {
       mdiOpenInNew,
       mdiLogoutVariant,
       mdiDotsVertical,
+      websiteUrl: this.$config.WEBSITE_URL,
     }
   },
   computed: {
@@ -145,6 +143,13 @@ export default {
     async isSignedIn() {
       if (this.isSignedIn) {
         await this.getCredits()
+
+        this.$gtm.push({ event: 'signIn', userId: this.user.sub })
+
+        this.$cookies.set('userId', this.user.sub, {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30,
+        })
       }
     },
   },

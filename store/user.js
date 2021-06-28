@@ -7,7 +7,7 @@ import {
 
 export const state = () => ({
   attrs: {},
-  loaded: false,
+  loading: true,
   idToken: '',
   refreshToken: '',
   isSignedIn: false,
@@ -19,8 +19,8 @@ export const mutations = {
   setAttrs(state, attrs) {
     state.attrs = { ...attrs, admin: attrs.admin === '1' }
   },
-  setLoaded(state, loaded) {
-    state.loaded = loaded
+  setLoading(state, loading) {
+    state.loading = loading
   },
   setIdToken(state, idToken) {
     state.idToken = idToken
@@ -46,12 +46,14 @@ export const actions = {
       ClientId: this.$config.COGNITO_CLIENT_ID,
     })
 
+    commit('setLoading', true)
+
     const cognitoUser = Pool.getCurrentUser()
 
     if (!cognitoUser) {
       commit('setAttrs', {})
       commit('setIsSignedIn', false)
-      commit('setLoaded', true)
+      commit('setLoading', false)
 
       return
     }
@@ -59,14 +61,14 @@ export const actions = {
     return new Promise((resolve, reject) => {
       cognitoUser.getSession((error, session) => {
         if (error) {
-          commit('setLoaded', true)
+          commit('setLoading', false)
 
           return reject(error)
         }
 
         cognitoUser.getUserAttributes((error, attributes) => {
           if (error) {
-            commit('setLoaded', true)
+            commit('setLoading', false)
 
             return reject(error)
           }
@@ -81,7 +83,7 @@ export const actions = {
           commit('setIdToken', session.getIdToken().getJwtToken())
           commit('setRefreshToken', session.getRefreshToken())
           commit('setIsSignedIn', attrs.email_verified === 'true')
-          commit('setLoaded', true)
+          commit('setLoading', false)
 
           resolve()
         })
@@ -138,7 +140,7 @@ export const actions = {
     })
 
     return new Promise((resolve, reject) => {
-      cognitoUser.confirmRegistration(code, true, (error, result) =>
+      cognitoUser.confirmRegistration(code.trim(), true, (error, result) =>
         error ? reject(error) : resolve(result)
       )
     })
@@ -168,6 +170,8 @@ export const actions = {
       ClientId: this.$config.COGNITO_CLIENT_ID,
     })
 
+    commit('setLoading', true)
+
     const cognitoUser = new CognitoUser({
       Username: Username.toLowerCase().trim(),
       Pool,
@@ -190,21 +194,25 @@ export const actions = {
     })
   },
 
-  verifySignIn({ dispatch }, { code }) {
+  verifySignIn({ commit, dispatch }, { code }) {
     const Pool = new CognitoUserPool({
       UserPoolId: this.$config.COGNITO_USER_POOL_ID,
       ClientId: this.$config.COGNITO_CLIENT_ID,
     })
+
+    commit('setLoading', true)
 
     const cognitoUser = Pool.getCurrentUser()
 
     return new Promise((resolve, reject) => {
       cognitoUser.getSession((error, session) => {
         if (error) {
+          commit('setLoading', false)
+
           return reject(error)
         }
 
-        cognitoUser.verifyAttribute('email', code, {
+        cognitoUser.verifyAttribute('email', code.trim(), {
           async onSuccess() {
             await dispatch('updateAttrs')
 
@@ -313,7 +321,7 @@ export const actions = {
     })
 
     return new Promise((resolve, reject) => {
-      cognitoUser.confirmPassword(code, password, {
+      cognitoUser.confirmPassword(code.trim(), password, {
         onSuccess: resolve,
         onFailure: reject,
       })
@@ -353,7 +361,11 @@ export const actions = {
     }
   },
 
-  async delete({ state, commit, dispatch }, attributes) {
+  async delete({ state, commit, dispatch }) {
+    if (state.impersonating) {
+      return
+    }
+
     const Pool = new CognitoUserPool({
       UserPoolId: this.$config.COGNITO_USER_POOL_ID,
       ClientId: this.$config.COGNITO_CLIENT_ID,
@@ -376,5 +388,17 @@ export const actions = {
     }
 
     await dispatch('updateAttrs')
+  },
+
+  async disable({ state, commit, dispatch }) {
+    if (state.impersonating && state.impersonator.admin) {
+      await this.$axios.delete('user')
+
+      const user = (await this.$axios.get('user')).data
+
+      commit('setAttrs', user)
+    } else {
+      await dispatch('updateAttrs')
+    }
   },
 }

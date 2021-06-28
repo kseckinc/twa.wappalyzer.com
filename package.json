@@ -4,7 +4,7 @@
   "description": "Identify technologies on websites.",
   "author": "Wappalyzer",
   "scripts": {
-    "dev": "ENVIRONMENT=beta nuxt",
+    "dev": "PORT=3001 ENVIRONMENT=beta nuxt",
     "prod": "NODE_ENV=production ENVIRONMENT=v2 nuxt",
     "build": "nuxt build",
     "generate": "nuxt generate",
@@ -14,23 +14,24 @@
     "deploy:v2": "ENVIRONMENT=v2 AWS_PROFILE=wappalyzer nuxt generate && aws s3 sync dist s3://twa.wappalyzer.com --acl public-read --cache-control max-age=31536000,public"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.10.1",
-    "@nuxtjs/google-gtag": "^1.0.4",
-    "@nuxtjs/pwa": "^3.0.2",
+    "@nuxtjs/axios": "^5.13.4",
+    "@nuxtjs/gtm": "^2.4.0",
+    "@nuxtjs/pwa": "^3.3.5",
     "amazon-cognito-identity-js": "^4.3.4",
-    "nuxt": "2.12.2"
+    "cookie-universal-nuxt": "^2.1.4",
+    "nuxt": "^2.15.6"
   },
   "devDependencies": {
-    "@mdi/js": "^5.5.55",
-    "@nuxtjs/eslint-config": "^3.1.0",
-    "@nuxtjs/eslint-module": "^2.0.0",
+    "@mdi/js": "^5.9.55",
+    "@nuxtjs/eslint-config": "^6.0.0",
+    "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/svg": "^0.1.12",
-    "@nuxtjs/vuetify": "^1.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^7.7.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-nuxt": ">=0.4.2",
-    "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^2.0.5"
+    "@nuxtjs/vuetify": "^1.11.3",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-nuxt": ">=2.0.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.0"
   }
 }

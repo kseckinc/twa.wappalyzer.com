@@ -1,11 +1,3 @@
-require('dotenv').config({
-  path: `.env.${
-    process.env.NODE_ENV === 'development' || process.env.ENVIRONMENT === 'beta'
-      ? 'beta'
-      : 'v2'
-  }`,
-})
-
 const publicRuntimeConfig = {
   AWS_REGION: 'ap-southeast-2',
   COGNITO_USER_POOL_ID: 'ap-southeast-2_Tz6DGDkmB',
@@ -17,9 +9,11 @@ const publicRuntimeConfig = {
   process.env.ENVIRONMENT === 'beta'
     ? {
         API_VERSION: 'beta',
+        WEBSITE_URL: 'https://www.wappalyzer.com',
       }
     : {
         API_VERSION: 'v2',
+        WEBSITE_URL: 'https://www.wappalyzer.com',
       }),
 }
 
@@ -39,7 +33,7 @@ export default {
     link: [
       {
         rel: 'preconnect',
-        href: 'https://www.google-analytics.com',
+        href: 'https://www.googletagmanager.com',
       },
       {
         rel: 'apple-touch-icon',
@@ -49,19 +43,22 @@ export default {
   },
   loading: false,
   css: ['~/assets/scss/styles.scss'],
-  plugins: ['~/plugins/vuetify.js', '~/plugins/axios.js'],
-  buildModules: [
-    '@nuxtjs/eslint-module',
-    '@nuxtjs/svg',
-    '@nuxtjs/vuetify',
-    [
-      '@nuxtjs/dotenv',
-      { filename: `.env.${process.env.ENVIRONMENT || 'beta'}` },
-    ],
+  plugins: [
+    '~/plugins/vuetify.js',
+    '~/plugins/axios.js',
+    '~/plugins/mixins.js',
   ],
-  modules: ['@nuxtjs/axios', '@nuxtjs/google-gtag', '@nuxtjs/pwa'],
-  'google-gtag': {
-    id: 'G-YV82S8286L',
+  buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/svg', '@nuxtjs/vuetify'],
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/pwa',
+    'cookie-universal-nuxt',
+    '@nuxtjs/gtm',
+  ],
+  gtm: {
+    id: 'GTM-MC85KCD',
+    pageTracking: true,
+    respectDoNotTrack: false,
   },
   axios: {
     baseURL: publicRuntimeConfig.BASE_URL,
@@ -82,6 +79,7 @@ export default {
           primary: {
             base: '#4608ad',
             lighten1: '#f0ebf9',
+            lighten2: '#f4f1fa',
             darken1: '#32067c',
             darken2: '#150233',
           },
@@ -111,5 +109,13 @@ export default {
   build: {
     extend(config, ctx) {},
     followSymlinks: true,
+  },
+  hooks: {
+    'build:done'() {
+      const modulesToClear = ['vue', 'vue/dist/vue.runtime.common.prod']
+      modulesToClear.forEach((entry) => {
+        delete require.cache[require.resolve(entry)]
+      })
+    },
   },
 }
