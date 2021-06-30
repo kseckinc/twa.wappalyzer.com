@@ -10,7 +10,7 @@ export const state = () => ({
   loading: true,
   idToken: '',
   refreshToken: '',
-  isSignedIn: false,
+  isSignedIn: null,
   impersonating: '',
   impersonator: null,
 })
