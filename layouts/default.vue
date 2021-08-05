@@ -85,12 +85,20 @@
                       <v-icon right small>{{ mdiOpenInNew }}</v-icon>
                     </v-list-item-title>
                   </v-list-item>
-                  <v-list-item v-else @click="signInDialog = true">
-                    <v-list-item-icon>
-                      <v-icon>{{ mdiAccount }}</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Sign up free</v-list-item-title>
-                  </v-list-item>
+                  <template v-else>
+                    <v-list-item @click="signUpDialog = true">
+                      <v-list-item-icon>
+                        <v-icon>{{ mdiAccountPlus }}</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title>Sign up free</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="signInDialog = true">
+                      <v-list-item-icon>
+                        <v-icon>{{ mdiAccount }}</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title>Sign in</v-list-item-title>
+                    </v-list-item>
+                  </template>
 
                   <v-list-item v-if="isSignedIn" @click="signOut">
                     <v-list-item-icon>
@@ -112,10 +120,18 @@
 
     <v-dialog
       v-if="!isLoading && !isSignedIn"
-      v-model="signInDialog"
+      v-model="signUpDialog"
       max-width="400px"
     >
       <SignIn mode-sign-up />
+    </v-dialog>
+
+    <v-dialog
+      v-if="!isLoading && !isSignedIn"
+      v-model="signInDialog"
+      max-width="400px"
+    >
+      <SignIn />
     </v-dialog>
   </v-app>
 </template>
@@ -125,6 +141,7 @@ import { mapState, mapActions } from 'vuex'
 import {
   mdiHome,
   mdiAccount,
+  mdiAccountPlus,
   mdiOpenInNew,
   mdiLogoutVariant,
   mdiDotsVertical,
@@ -143,11 +160,13 @@ export default {
       drawer: false,
       mdiHome,
       mdiAccount,
+      mdiAccountPlus,
       mdiOpenInNew,
       mdiLogoutVariant,
       mdiDotsVertical,
       websiteUrl: this.$config.WEBSITE_URL,
       signInDialog: false,
+      signUpDialog: false,
     }
   },
   computed: {

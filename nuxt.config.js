@@ -54,11 +54,16 @@ export default {
     '@nuxtjs/pwa',
     'cookie-universal-nuxt',
     '@nuxtjs/gtm',
+    '@nuxtjs/recaptcha',
   ],
   gtm: {
     id: 'GTM-MC85KCD',
     pageTracking: true,
     respectDoNotTrack: false,
+  },
+  recaptcha: {
+    siteKey: '6LeW3NobAAAAACuVCOX8MLhIHtJCitFkuUZjRPRo',
+    version: 2,
   },
   axios: {
     baseURL: publicRuntimeConfig.BASE_URL,
